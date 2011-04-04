@@ -6,6 +6,7 @@ use POSIX;
 
 # sysconfとpathconfの定義値を出力する
 
+print "sysconf:\n";
 for my $key (%POSIX::) {
     next unless $key =~ m{^_SC_}xms;
 
@@ -20,16 +21,15 @@ for my $key (%POSIX::) {
         }
     }
 }
+print "\n";
 
-my $fd = POSIX::open("/etc/passwd", POSIX::O_RDONLY);
-die "Can't open file: $!" unless defined $fd;
-
+print "pathconf:\n";
 for my $key (%POSIX::) {
     next unless $key =~ m{^_PC_}xms;
 
     {
         no strict "refs";
-        my $val = POSIX::pathconf($fd, &{"POSIX::$key"});
+        my $val = POSIX::pathconf("/", &{"POSIX::$key"});
         if (defined $val) {
             print "$key, $val\n";
         } else {
