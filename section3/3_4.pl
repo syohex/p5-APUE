@@ -9,9 +9,9 @@ use POSIX;
 
 my $file = shift or die "Usage: $0 file\n";
 open my $fh, ">>", $file or die "Can't open $file: $!";
-my $flags = fcntl $fh, F_GETFL, 0 or die "Can't fcntl $file: $!";
+my $flag = fcntl $fh, F_GETFL, 0 or die "Can't fcntl $file: $!";
 
-my $accmode = $flags & O_ACCMODE;
+my $accmode = $flag & O_ACCMODE;
 if ($accmode == O_RDONLY) {
     print "read only\n"
 } elsif ($accmode == O_WRONLY) {
@@ -20,13 +20,13 @@ if ($accmode == O_RDONLY) {
     print "read write\n";
 }
 
-if ($flags & O_APPEND) {
+if ($flag & O_APPEND) {
     print "append\n";
 }
-if ($flags & O_NONBLOCK) {
+if ($flag & O_NONBLOCK) {
     print "nonblocking\n";
 }
-if ($flags & O_SYNC) {
+if ($flag & O_SYNC) {
     print "synchronous write";
 }
 
