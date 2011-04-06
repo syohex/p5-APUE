@@ -28,21 +28,31 @@ Perlで書いたどうなるかということを示すだけですので, 詳�
 
 ### [第  3章]
 
+[ファイル入出力](http://d.hatena.ne.jp/syohex/20110405/1302006286)
+
 [本家 Python版](http://d.hatena.ne.jp/atsuoishimoto/20110310/1299715993)
 
 ### [第  4章]
+
+[ファイルとディレクトリ](http://d.hatena.ne.jp/syohex/20110405/1302017283)
 
 [本家 Python版](http://d.hatena.ne.jp/atsuoishimoto/20110315/1300142354)
 
 ### [第  5章]
 
+[標準入出力ライブラリ](http://d.hatena.ne.jp/syohex/20110406/1302098867)
+
 [本家 Python版](http://d.hatena.ne.jp/atsuoishimoto/20110317/1300328961)
 
 ### [第  6章]
 
+[システムデータファイルと情報](http://d.hatena.ne.jp/syohex/20110406/1302099637)
+
 [本家 Python版](http://d.hatena.ne.jp/atsuoishimoto/20110318/1300407363)
 
 ### [第  7章]
+
+[第7章 プロセスの環境](http://d.hatena.ne.jp/syohex/20110406/1302100577)
 
 [本家 Python版](http://d.hatena.ne.jp/atsuoishimoto/20110322/1300757335)
 
