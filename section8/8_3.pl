@@ -13,7 +13,7 @@ sub pr_exit {
         printf "normal termination, exit status = %d\n"
         , POSIX::WEXITSTATUS($status);
     } elsif (POSIX::WIFSIGNALED($status)) {
-        printf "bnormal termination, signal number = %d\n"
+        printf "abnormal termination, signal number = %d\n"
         , POSIX::WTERMSIG($status);
     } elsif (POSIX::WIFSTOPPED($status)) {
         printf "child stopped, signal number = %d\n"
