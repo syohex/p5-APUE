@@ -18,7 +18,6 @@ sub charatatime {
     }
 }
 
-my ($rd, $wr);
 my $sigflag = 0;
 sub TELL_WAIT {
     $SIG{USR1} = sub { $sigflag = 1; };
