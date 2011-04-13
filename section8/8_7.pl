@@ -19,33 +19,15 @@ sub charatatime {
 }
 
 my ($rd, $wr);
+my $sigflag = 0;
 sub TELL_WAIT {
-    pipe $rd, $wr;
-    die "Error: pipe $|\n" unless defined $rd && defined $wr;
-
-    my $flags = fcntl $wr, F_GETFL, 0;
-    fcntl $wr, F_SETFL, $flags | POSIX::O_NONBLOCK;
-
-    $SIG{USR1} = sub {};
+    $SIG{USR1} = sub { $sigflag = 1; };
 }
 
 sub WAIT_PARENT {
     # wait for parent to terminate
-    my $rin = '';
-    vec($rin, fileno($rd), 1) = 1;
-    while (1) {
-        select $rin, undef, undef, undef;
-        if ($! == POSIX::EINTR) {
-            last;
-        } else {
-            die "Error: select $!\n";
-        }
-
-        while (1) {
-            my $len = sysread $rd, my $buf, 64;
-            die "Error: read $!\n" unless defined $len;
-            last if $len == 0;
-        }
+    while ($sigflag == 0) {
+        POSIX::pause();
     }
 }
 
@@ -65,5 +47,4 @@ if ($pid == 0) {
 } else {
     charatatime("output from parent\n");
     TELL_CHILD($pid);
-    waitpid $pid, 0;
 }
