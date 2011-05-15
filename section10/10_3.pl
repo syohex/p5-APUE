@@ -18,11 +18,3 @@ if ($pid == 0) { # child
 } else {
     POSIX::pause;
 }
-
-__END__
-signal.signal(signal.SIGCLD, sig_cld)
-pid = os.fork()
-if pid == 0:   # child
-    time.sleep(2)
-else:          # parent
-    signal.pause()
