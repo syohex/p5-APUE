@@ -40,15 +40,9 @@ sub sleep {
 
     $unslept = alarm 0;
 
-    sigaction(POSIX::SIGALRM, $oldact, undef);
-
-
+    sigaction(POSIX::SIGALRM, $oldact);
 }
 
-__END__
-
-def sleep(nsecs):
-    # reset signal mask, which unblocks SIGALRM
-    sigprocmask(SIG_SETMASK, byref(oldmask), None)
-
-    return unslept
+my $time = shift || 5;
+print "sleep $time second\n";
+main::sleep($time);
