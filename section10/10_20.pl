@@ -2,30 +2,38 @@
 use strict;
 use warnings;
 
-#POSIX.2の正しいsystem関数の実装
+use POSIX ();
+
+# POSIX.2の正しいsystem関数の実装
+
+sub my_system {
+    my $cmdstring = shift;
+
+    unless (defined $cmdstring) {
+        return 1;
+    }
+
+#    ignore = sigaction_t()
+#    saveintr = sigaction_t()
+#    savequit = sigaction_t()
+
+    my $chldmask = POSIX::SigSet->new;
+    my $savemask = POSIX::SigSet->new;
+
+    my $ignore = POSIX::SigAction->new(POSIX::SIGINT, POSIX::SIGQUIT);
+    $ignore->flags(0);
+
+
+
+
+
+}
 
 __END__
-
-import signal, os
-from ctypes import *
-from posixsignal import *
-
-def system(cmdstring):
-    if not cmdstring:
-        return 1    # always a command processor with Unix
-
-    ignore = sigaction_t()
-    saveintr = sigaction_t()
-    savequit = sigaction_t()
-
-    chldmask = sigset_t()
-    savemask = sigset_t()
-
     # ignore SIGINT and SIGQUIT
     ignore.sa_handler = cast(signal.SIG_IGN, sighandler_t)
     sigemptyset(byref(ignore.sa_mask))
     ignore.sa_flags = 0
-
     if sigaction(signal.SIGINT, byref(ignore), byref(saveintr)) < 0:
         return -1
     if sigaction(signal.SIGQUIT, byref(ignore), byref(savequit)) < 0:
