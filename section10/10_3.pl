@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use POSIX;
+use POSIX ();
 
 local $SIG{CHLD} = sub {
     print "SIGCHLD received\n";
