@@ -34,6 +34,8 @@ sub sig_tstp {
 # only catch SIGTSTP if we' re running with a job-control shell
 $SIG{TSTP} = \&sig_tstp;
 
+print "My pid = $$\n";
+
 while (1) {
     my $ret = sysread STDIN, my $buf, 1024;
     die "Error: read $!\n" unless defined $ret;
@@ -43,7 +45,6 @@ while (1) {
         next;
     }
 
-    last unless defined $buf;
-
+    last if length $buf == 0;
     syswrite STDOUT, $buf;
 }
