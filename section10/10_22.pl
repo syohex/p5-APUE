@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use POSIX;
+use POSIX ();
 
 # SIGTSTPの処理方法
 
