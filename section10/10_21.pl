@@ -2,7 +2,7 @@
 use strict;
 use warnings;
 
-use POSIX;
+use POSIX ();
 
 # sleepの信頼性のある実装
 
@@ -24,7 +24,7 @@ sub sleep {
 
     # set out handler, save previous information
     $SIG{ALRM} = \&sig_alrm;
-    sigaction(POSIX::SIGALRM, undef, $oldact);
+    POSIX::sigaction(POSIX::SIGALRM, undef, $oldact);
 
     $newmask->addset(POSIX::SIGALRM);
 
@@ -34,13 +34,13 @@ sub sleep {
 
     $suspmask = $oldmask;
     $suspmask->delset(POSIX::SIGALRM);
-    sigsuspend($suspmask);
+    POSIX::sigsuspend($suspmask);
 
     # some signalshas been caught, SIGALRM is now blocked
 
     $unslept = alarm 0;
 
-    sigaction(POSIX::SIGALRM, $oldact);
+    POSIX::sigaction(POSIX::SIGALRM, $oldact);
 }
 
 my $time = shift || 5;
