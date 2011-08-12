@@ -2,6 +2,8 @@
 use strict;
 use warnings;
 
+# edエディタを起動するためにsystemを利用する
+
 local $SIG{INT} = sub {
     print "caught SIGINT\n";
 };

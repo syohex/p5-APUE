@@ -2,6 +2,8 @@
 use strict;
 use warnings;
 
+# 親と子の同期のためのルーティン
+
 use POSIX ();
 
 my $newmask  = POSIX::SigSet->new;
