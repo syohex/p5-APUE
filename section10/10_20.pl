@@ -3,6 +3,8 @@ use strict;
 use warnings;
 
 use POSIX ();
+use Errno ();
+use Proc::Wait3 ();
 
 # POSIX.2の正しいsystem関数の実装
 
@@ -13,62 +15,55 @@ sub my_system {
         return 1;
     }
 
-#    ignore = sigaction_t()
-#    saveintr = sigaction_t()
-#    savequit = sigaction_t()
-
-    my $chldmask = POSIX::SigSet->new;
-    my $savemask = POSIX::SigSet->new;
-
-    my $ignore = POSIX::SigAction->new(POSIX::SIGINT, POSIX::SIGQUIT);
+    my $ignore = POSIX::SigAction->new;
+    $ignore->handler('IGNORE');
     $ignore->flags(0);
 
+    my $saveintr = POSIX::SigAction->new;
+    unless (POSIX::sigaction(POSIX::SIGINT, $ignore, $saveintr)) {
+        return -1;
+    }
 
-
-
-
-}
-
-__END__
-    # ignore SIGINT and SIGQUIT
-    ignore.sa_handler = cast(signal.SIG_IGN, sighandler_t)
-    sigemptyset(byref(ignore.sa_mask))
-    ignore.sa_flags = 0
-    if sigaction(signal.SIGINT, byref(ignore), byref(saveintr)) < 0:
-        return -1
-    if sigaction(signal.SIGQUIT, byref(ignore), byref(savequit)) < 0:
-        return -1
+    my $savequit = POSIX::SigAction->new;
+    unless (POSIX::sigaction(POSIX::SIGQUIT, $ignore, $savequit)) {
+        return -1;
+    }
 
     # now block SIGCHLD
-    sigemptyset(byref(chldmask))
-    sigaddset(byref(chldmask), signal.SIGCHLD)
-    if sigprocmask(SIG_BLOCK, byref(chldmask), byref(savemask)) < 0:
-        return -1
+    my $chldmask = POSIX::SigSet->new(POSIX::SIGCHLD);
+    my $savemask;
+    POSIX::sigprocmask(POSIX::SIG_BLOCK, $chldmask, $savemask);
 
-    pid = os.fork()
-    if pid == 0:    # child
+    my $pid = fork;
+    die "Can't fork: $!" unless defined $pid;
+
+    my $status;
+    if ($pid == 0) { # child
         # restore previous signal actions & reset signal mask
-        sigaction(signal.SIGINT, byref(saveintr), None)
-        sigaction(signal.SIGQUIT, byref(savequit), None)
-        sigprocmask(SIG_SETMASK, byref(savemask), None)
-        os.execl("/bin/sh", "sh", "-c", cmdstring)
-        sys.exit(127)  # exec error
-    else:    # parent
-        while True:
-            try:
-                pid, status = os.waitpid(pid, 0)
-                break
-            except OSError, e:
-                if e.errno != errno.EINTR:
-                    status = -1  # error other than EINTR from waitpid()
-                    break
+        POSIX::sigaction(POSIX::SIGINT, $saveintr);
+        POSIX::sigaction(POSIX::SIGQUIT, $savequit);
+        POSIX::sigprocmask(POSIX::SIG_SETMASK, $savemask);
 
-    # restore previous signal actions & reset signal mask
-    if sigaction(signal.SIGINT, byref(saveintr), None) < 0:
-        return -1
-    if sigaction(signal.SIGQUIT, byref(savequit), None) < 0:
-        return -1
-    if sigprocmask(SIG_SETMASK, byref(savemask), None) < 0:
-        return -1
+        exec { '/bin/sh' } 'sh', '-c', $cmdstring or die "Can't exec: $!";
+        exit 127; # never reach here
+    } else { # parent
+        (undef, $status) = Proc::Wait3::wait3(1);
+        if ($! && $! != Errno::EINTR) {
+            warn "Error while waiting child process: $!\n";
+        }
+    }
 
-    return status
+    unless (POSIX::sigaction(POSIX::SIGINT, $saveintr)) {
+        return -1;
+    }
+    unless (POSIX::sigaction(POSIX::SIGQUIT, $savequit)) {
+        return -1;
+    }
+    unless (POSIX::sigprocmask(POSIX::SIG_SETMASK, $savemask)) {
+        return -1;
+    }
+
+    return $status;
+}
+
+my_system('ls -l');
