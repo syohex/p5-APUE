@@ -4,40 +4,45 @@ use warnings;
 
 # POSIX.1のabortの実装
 
-__END__
+use POSIX ();
+use IO::Handle;
 
-import signal, os
-from ctypes import *
-from posixsignal import *
+sub abort {
+    my $oldaction = POSIX::SigAction->new;
 
-def abort():
-    mask = sigset_t()
-    action = sigaction_t()
+    POSIX::sigaction(POSIX::SIGABRT, undef, $oldaction);
 
-    # caller can't ignore SIGABRT, if so reset to default
-    sigaction(signal.SIGABRT, None, byref(action))
-    if action.sa_handler == cast(signal.SIG_IGN, sighandler_t):
-        action.sa_handler = cast(signal.SIG_DFL, sighandler_t)
-        sigaction(signal.SIGABRT, byref(action), None)
+    if (ref $oldaction->handler ne 'CODE') {
+        # caller can't ignore SIGABRT, if so reset to default
+        if ($oldaction->handler eq 'IGNORE') {
+            $oldaction->handler('DEFALUT');
+            POSIX::sigaction(POSIX::SIGABRT, $oldaction);
+        }
 
-    if action.sa_handler == cast(signal.SIG_DFL, sighandler_t):
-        libc.fflush(None)    # flush all open stdio streams
+        if ($oldaction->handler eq 'DEFAULT') {
+            autoflush STDOUT 1; # flush all open stdio streams
+        }
+    }
 
-    # caller can't block SIGABRT; make sure it's unblocked
-    sigfillset(byref(mask))
-    sigdelset(byref(mask), signal.SIGABRT)   # mask has only SIGABRT turned off
-    sigprocmask(SIG_SETMASK, byref(mask), None)
+    my $mask = POSIX::SigSet->new;
+    $mask->fillset;
+    $mask->delset(POSIX::SIGABRT);
 
-    os.kill(os.getpid(), signal.SIGABRT) # send the signal
+    POSIX::sigprocmask(POSIX::SIG_SETMASK, $mask);
 
+    kill POSIX::SIGABRT, POSIX::getpid();
     # if we are here, process caught SIGABRT and returned
 
-    libc.fflush(None)    # flush all open stdio streams
+    autoflush STDOUT, 1;
 
-    action.sa_handler = cast(signal.SIG_DFL, sighandler_t)
-    sigaction(signal.SIGABRT, byref(action), None)   # reset disposition to default
-    sigprocmask(SIG_SETMASK, byref(mask), None)      # just in case
+    my $action = POSIX::SigAction->new;
+    $action->handler('DEFAULT');
+    POSIX::sigaction(POSIX::SIGABRT, $action);
+    POSIX::sigprocmask(POSIX::SIG_SETMASK, $mask);
 
-    os.kill(os.getpid(), signal.SIGABRT)  # and one more time
+    kill POSIX::SIGABRT, POSIX::getpid(); # and one more time
 
-    sys.exit(1)   # this should never be execused ...
+    exit 1;
+}
+
+abort();
