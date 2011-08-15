@@ -2,6 +2,8 @@
 use strict;
 use warnings;
 
+# 割り込み文字を無効にし、ファイルの終わりの文字を変更する
+
 use POSIX ();
 
 unless (POSIX::isatty(0)) {
