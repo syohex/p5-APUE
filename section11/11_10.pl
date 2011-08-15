@@ -7,16 +7,16 @@ use Term::ReadKey ();
 # 端末モードをローまたはcbreakに設定
 
 sub tty_cbreak {
-    my $fd = shift;
-    Term::ReadKey::ReadMode('cbreak', $fd)
+    my $fh = shift;
+    Term::ReadKey::ReadMode('cbreak', $fh)
 }
 
 sub tty_raw {
-    my $fd = shift;
-    Term::ReadKey::ReadMode('raw', $fd)
+    my $fh = shift;
+    Term::ReadKey::ReadMode('raw', $fh)
 }
 
 sub tty_reset {
-    my $fd = shift;
-    Term::ReadKey::ReadMode('restore', $fd);
+    my $fh = shift;
+    Term::ReadKey::ReadMode('restore', $fh);
 }
