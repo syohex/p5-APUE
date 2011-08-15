@@ -23,8 +23,7 @@ sub ttyname {
     }
 
     opendir my $dh, $DEV or die "Can't open directory $DEV: $!\n";
-    for my $dir (readdir $dh) {
-        next if $dir eq '.' || $dir eq '..';
+    for my $dir (grep !m{\.\.?}, readdir $dh) {
         my $pathname = File::Spec->catfile($DEV, $dir);
         my @devstats = stat $pathname;
 
