@@ -11,12 +11,3 @@ my $passwd = getpass("Enter password:");
 print "\npassword is $passwd\n";
 
 $passwd = "\0";
-
-__END__
-passwd = getpasswd("Enter password:")
-passwdlen = len(passwd)
-
-# now we use password
-
-del passwd
-trash = "\0"+passwdlen
