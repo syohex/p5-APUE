@@ -2,11 +2,11 @@
 use strict;
 use warnings;
 
-use Term::ReadKey qw(ReadMode ReadLine);
+use Term::ReadKey ();
 
 print "Input password >> ";
 
-ReadMode('noecho');
-my $password = ReadLine(0);
+Term::ReadKey::ReadMode('noecho');
+my $password = Term::ReadKey::ReadLine(0);
 
 print "\npassword is $password\n";
