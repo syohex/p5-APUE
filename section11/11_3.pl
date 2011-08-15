@@ -2,16 +2,8 @@
 use strict;
 use warnings;
 
-_ctermid_name = '';
+# POSIX.1のctermidの実装
 
 sub ctermid {
     return "/dev/tty";
 }
-
-
-__END__
-_ctermid_name = ''
-
-def ctermid():
-    return "/dev/tty"
-
